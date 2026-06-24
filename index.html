@@ -401,7 +401,7 @@ function updPrev(){
   document.getElementById('prev').style.display='block';
 }
 
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxlPAZuphF-WBH-uR2wR7eP-dT_BJHVd8HlvZ67wJpAf4tHdVawuxuxoZON5fooYg3o/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbz-VCJZhwTIPWIFG3ptKgELM_6Q_KVljSJehTEm0IiW0CTHYgw0xA2HDdK7OGA8tU5H/exec';
 
 function saveShift(){
   const date=document.getElementById('fd').value;
@@ -506,8 +506,25 @@ function syncCfgToSheets(){
   fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'}).catch(()=>{});
 }
 
+function loadShiftsFromSheets(){
+  const cbName='_shifts'+Date.now();
+  const s=document.createElement('script');
+  window[cbName]=function(data){
+    if(Array.isArray(data)&&data.length>0){
+      saveShifts(data);
+      render();
+    }
+    delete window[cbName];
+    if(s.parentNode)s.parentNode.removeChild(s);
+  };
+  s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
+  s.src=SCRIPT_URL+'?action=get_shifts&callback='+cbName;
+  document.body.appendChild(s);
+}
+
 render();
 loadCfgFromSheets();
+loadShiftsFromSheets();
 </script>
 </body>
 </html>
