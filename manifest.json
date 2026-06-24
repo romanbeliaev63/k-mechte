@@ -1,0 +1,12 @@
+{
+  "name": "Будни таксиста",
+  "short_name": "Будни таксиста",
+  "start_url": "/budni-taksista/",
+  "display": "standalone",
+  "background_color": "#1B6B3A",
+  "theme_color": "#1B6B3A",
+  "icons": [
+    {"src": "icon180.png", "sizes": "180x180", "type": "image/png"},
+    {"src": "icon512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}
