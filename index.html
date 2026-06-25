@@ -305,14 +305,18 @@ function renderDash(c){
     transfers=[
       {icon:'ti-tool',l:'Ремонт. фонд',v:lc.repair,bg:'var(--yellow-lt)',c:'#BF360C'},
       {icon:'ti-heart',l:'Маме',v:last.mom,bg:'var(--red-lt)',c:'var(--red)'},
-      {icon:'ti-building-bank',l:'Подушка',v:lc.pillow,bg:'var(--blue-lt)',c:'var(--blue)'},
-      {icon:'ti-car',l:'Нов. машина',v:lc.car,bg:'var(--purple-lt)',c:'var(--purple)'},
+      {icon:'ti-building-bank',l:'Подушка безопасности',v:lc.pillow,bg:'var(--blue-lt)',c:'var(--blue)'},
+      {icon:'ti-car',l:'Новая машина',v:lc.car,bg:'var(--purple-lt)',c:'var(--purple)'},
       {icon:'ti-wallet',l:'Себе',v:lc.mine,bg:'var(--green-lt)',c:'var(--green)'},
     ];
   }
 
   const daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const daysElapsed=now.getDate();
   const daysLeft=daysInMonth-now.getDate()+1;
+  const avgPerDay=daysElapsed>0?Math.round(monthNet/daysElapsed):0;
+  const projectedMonth=avgPerDay*daysInMonth;
+  const avgDayColor=projectedMonth>=CFG.goalMonth?'var(--green)':projectedMonth>=CFG.goalMonth*0.7?'#E65100':'var(--red)';
   const shiftsLeft=CFG.planShifts-worked;
   let sc,st,emoji;
   if(shiftsLeft<=0){sc='var(--green)';st='План выполнен!';emoji='🟢';}
@@ -323,8 +327,8 @@ function renderDash(c){
   const goals=[
     {name:'Долг маме',icon:'ti-heart',acc:totalPaid,goal:CFG.debtMom,c:'var(--red)',bg:'var(--red-lt)'},
     {name:'Ремонт. фонд',icon:'ti-tool',acc:totalRepair,goal:CFG.goalRepair,c:'#BF360C',bg:'var(--yellow-lt)'},
-    {name:'Подушка',icon:'ti-building-bank',acc:totalPillow,goal:CFG.goalPillow,c:'var(--blue)',bg:'var(--blue-lt)'},
-    {name:'Нов. машина',icon:'ti-car',acc:totalCar,goal:CFG.goalCar,c:'var(--purple)',bg:'var(--purple-lt)'},
+    {name:'Подушка безопасности',icon:'ti-building-bank',acc:totalPillow,goal:CFG.goalPillow,c:'var(--blue)',bg:'var(--blue-lt)'},
+    {name:'Новая машина',icon:'ti-car',acc:totalCar,goal:CFG.goalCar,c:'var(--purple)',bg:'var(--purple-lt)'},
   ];
 
   const el=document.createElement('div');
@@ -358,6 +362,18 @@ function renderDash(c){
     <div class="sec">Статус дня</div>
     <div class="status"><div class="sdot" style="background:${sc}"></div><div class="stxt" style="color:${sc}">${emoji} ${st}</div></div>
     <div class="sec">Смены месяца</div>
+    <div class="met" style="background:var(--bg);border:2px solid ${avgDayColor};border-radius:var(--r);padding:12px 16px;margin-bottom:0">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="met-l">Средний доход в день</div>
+          <div style="font-size:22px;font-weight:700;color:${avgDayColor};margin-top:2px">${fmt(avgPerDay)}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="met-l">Проекция на месяц</div>
+          <div style="font-size:14px;font-weight:600;color:${avgDayColor};margin-top:2px">${fmt(projectedMonth)}</div>
+        </div>
+      </div>
+    </div>
     <div class="g2">
       <div class="met"><div class="met-l">Отработано</div><div class="met-v">${worked} из ${CFG.planShifts}</div></div>
       <div class="met"><div class="met-l">Осталось смен</div><div class="met-v">${Math.max(shiftsLeft,0)}</div></div>
