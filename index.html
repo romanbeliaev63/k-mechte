@@ -36,7 +36,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 
 .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px}
 
-.nav{background:var(--bg);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0)}
+.nav{background:var(--bg);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:calc(env(safe-area-inset-bottom,0) + 10px)}
 .nav-btn{flex:1;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:9px;font-family:inherit;transition:color .15s}
 .nav-btn.active{color:var(--green)}
 
