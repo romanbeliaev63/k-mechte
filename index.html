@@ -19,6 +19,7 @@
   --yellow:#BF360C;--yellow-lt:#FFF3E0;
   --blue:#0D47A1;--blue-lt:#E3F2FD;
   --purple:#4A148C;--purple-lt:#F3E5F5;
+  --orange:#E65100;--orange-lt:#FBE9E7;
   --bg:#FFFFFF;--bg2:#F5F5F5;--bg3:#EEEEEE;
   --text:#1A1A1A;--text2:#757575;--text3:#BDBDBD;
   --border:#E0E0E0;
@@ -31,36 +32,34 @@
     --border:#38383A;
     --green-lt:#0A2E14;--green-md:#2E7D32;
     --red-lt:#2E0A0A;--yellow-lt:#2E1A00;
-    --blue-lt:#0A1929;--purple-lt:#1A0A2E
+    --blue-lt:#0A1929;--purple-lt:#1A0A2E;--orange-lt:#2E1500
   }
 }
 html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg2)}
 .app{display:flex;flex-direction:column;height:100%;max-width:480px;margin:0 auto;background:var(--bg2);position:relative}
 
-/* topbar */
 .topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:env(safe-area-inset-top,0) 16px 0;padding-top:calc(env(safe-area-inset-top,12px) + 12px);padding-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .topbar-l .t1{font-size:16px;font-weight:600;color:var(--text)}
 .topbar-l .t2{font-size:12px;color:var(--text2);margin-top:1px}
 .topbar-r{font-size:12px;color:var(--text2);text-align:right;line-height:1.5}
 
-/* content */
 .content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:10px}
 
-/* nav */
 .nav{background:var(--bg);border-top:1px solid var(--border);display:flex;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,0)}
-.nav-btn{flex:1;padding:10px 0 8px;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:10px;font-family:inherit;transition:color .15s}
-.nav-btn i{font-size:24px}
+.nav-btn{flex:1;padding:8px 0 6px;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;color:var(--text2);font-size:9px;font-family:inherit;transition:color .15s}
 .nav-btn.active{color:var(--green)}
 
-/* cards */
 .card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
 .card.green{background:var(--green-lt);border-color:var(--green-md)}
+.card.dream{background:linear-gradient(135deg,#0D47A1 0%,#1565C0 100%);border:none}
 .lbl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.lbl.w{color:rgba(255,255,255,.75)}
 .big{font-size:28px;font-weight:700;color:var(--green);line-height:1.1}
+.big.w{color:#fff}
 .sub{font-size:12px;color:var(--text2);margin-top:4px}
+.sub.w{color:rgba(255,255,255,.7)}
 .sec{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;padding-top:2px}
 
-/* transfers */
 .tlist{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
 .trow{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--border)}
 .trow:last-child{border-bottom:none}
@@ -68,34 +67,30 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .tico{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .trow-r{font-size:14px;font-weight:600}
 
-/* grid metrics */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .met{background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px}
 .met-l{font-size:11px;color:var(--text2);margin-bottom:4px}
 .met-v{font-size:16px;font-weight:600;color:var(--text)}
 
-/* status */
 .status{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px}
 .sdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 .stxt{font-size:14px;font-weight:600}
 
-/* progress */
 .prog-wrap{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:16px}
 .pi-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
 .pi-name{font-size:13px;font-weight:600;color:var(--text);display:flex;align-items:center;gap:6px}
-.pi-name i{font-size:15px}
 .pi-pct{font-size:12px;font-weight:600}
 .pbar{height:7px;border-radius:4px;overflow:hidden;margin-bottom:5px}
 .pbar-fill{height:100%;border-radius:4px;transition:width .4s ease}
 .pi-meta{display:flex;justify-content:space-between}
 .pi-meta span{font-size:11px;color:var(--text2)}
 
-/* add button */
 .add-btn{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:15px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-family:inherit;transition:opacity .15s;-webkit-appearance:none}
 .add-btn:active{opacity:.85}
-.add-btn i{font-size:18px}
+.add-btn.sec2{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+.save-btn{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:16px;font-size:16px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;-webkit-appearance:none;transition:opacity .15s}
+.save-btn:active{opacity:.85}
 
-/* form */
 .fhd{display:flex;align-items:center;gap:10px;padding:14px 0 6px}
 .fhd h2{font-size:18px;font-weight:600;color:var(--text)}
 .back-btn{background:none;border:none;cursor:pointer;color:var(--text2);display:flex;align-items:center;padding:4px;border-radius:var(--r2)}
@@ -103,33 +98,32 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .frow{display:flex;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border)}
 .frow:last-child{border-bottom:none}
 .frow-l{font-size:14px;color:var(--text2);flex:1;display:flex;align-items:center;gap:8px}
-.frow-l i{font-size:17px}
 .finp{background:none;border:none;outline:none;font-size:16px;font-weight:600;color:var(--text);width:130px;text-align:right;font-family:inherit;-webkit-appearance:none}
 .finp[type=date]{font-size:14px;font-weight:400;color:var(--text)}
+.finp[type=text]{width:160px;font-weight:400;font-size:14px}
 .finp::placeholder{color:var(--text3);font-weight:400}
 .fsuf{font-size:14px;color:var(--text2);margin-left:3px}
+.fsel{background:none;border:none;outline:none;font-size:14px;font-weight:600;color:var(--green);text-align:right;font-family:inherit;-webkit-appearance:none;cursor:pointer;max-width:180px}
 .prev{background:var(--green-lt);border:1px solid var(--green-md);border-radius:var(--r);padding:13px 16px;margin-bottom:10px}
 .prev-t{font-size:11px;color:var(--green);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-weight:600}
 .prev-row{display:flex;justify-content:space-between;margin-bottom:5px}
 .prev-row:last-child{margin-bottom:0}
 .prev-row span:first-child{font-size:13px;color:var(--text2)}
 .prev-row span:last-child{font-size:13px;font-weight:600;color:var(--green)}
-.save-btn{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:16px;font-size:16px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;font-family:inherit;-webkit-appearance:none;transition:opacity .15s}
-.save-btn:active{opacity:.85}
-.save-btn i{font-size:18px}
 
-/* history */
 .hcard{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:13px 16px;margin-bottom:8px}
+.hcard.expense{border-left:3px solid var(--orange)}
 .hcard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .hcard-date{font-size:14px;font-weight:600;color:var(--text)}
+.hcard-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;background:var(--orange-lt);color:var(--orange)}
 .hcard-mine{font-size:15px;font-weight:700;color:var(--green)}
+.hcard-mine.exp{color:var(--orange)}
 .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:3px 12px}
 .hgrid span{font-size:12px;color:var(--text2)}
 .hgrid span b{color:var(--text);font-weight:600}
 .del-btn{background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;border-radius:6px;transition:color .15s}
 .del-btn:active{color:var(--red)}
 
-/* settings */
 .sgrp{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:10px}
 .srow{display:flex;align-items:center;padding:13px 16px;border-bottom:1px solid var(--border)}
 .srow:last-child{border-bottom:none}
@@ -140,19 +134,38 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .ssuf{font-size:13px;color:var(--text2);margin-left:2px}
 .save-cfg-btn{background:var(--green);color:#fff;border:none;border-radius:var(--r);padding:14px;font-size:15px;font-weight:600;cursor:pointer;width:100%;font-family:inherit;-webkit-appearance:none}
 
-/* toast */
+.stat-nav{display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px}
+.stat-nav button{background:none;border:none;cursor:pointer;color:var(--text2);font-size:22px;padding:0 4px;line-height:1;font-family:inherit}
+.stat-nav span{font-size:15px;font-weight:600;color:var(--text)}
+.stat-block{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:11px 16px;border-bottom:1px solid var(--border)}
+.stat-row:last-child{border-bottom:none}
+.stat-lbl{font-size:13px;color:var(--text2)}
+.stat-val{font-size:14px;font-weight:600;color:var(--text)}
+.stat-val.g{color:var(--green)}
+.stat-val.o{color:var(--orange)}
+.stat-val.r{color:var(--red)}
+.rec-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.rec-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--r2);padding:10px 12px}
+.rec-v{font-size:17px;font-weight:700;color:var(--text);line-height:1.2}
+.rec-l{font-size:10px;color:var(--text2);margin-top:3px}
+
+.choice-wrap{display:flex;flex-direction:column;gap:10px;padding-top:8px}
+.choice-btn{background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:18px 16px;display:flex;align-items:center;gap:14px;cursor:pointer;width:100%;font-family:inherit;text-align:left;-webkit-appearance:none;transition:border-color .15s}
+.choice-btn:active{border-color:var(--green)}
+.choice-ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.choice-t{font-size:15px;font-weight:600;color:var(--text)}
+.choice-s{font-size:12px;color:var(--text2);margin-top:2px}
+
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(8px);background:rgba(0,0,0,.82);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:all .22s;pointer-events:none;z-index:999;white-space:nowrap;backdrop-filter:blur(8px)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
 .empty{text-align:center;padding:48px 0;color:var(--text2);font-size:14px}
-.empty i{font-size:40px;display:block;margin-bottom:10px;color:var(--text3)}
 </style>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231B6B3A'/><circle cx='50' cy='50' r='16' fill='%23fff'/><circle cx='50' cy='50' r='8' fill='%231B6B3A'/><line x1='50' y1='5' x2='50' y2='30' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='50' y1='70' x2='50' y2='95' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='5' y1='50' x2='30' y2='50' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='70' y1='50' x2='95' y2='50' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='18' y1='18' x2='36' y2='36' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='64' y1='64' x2='82' y2='82' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='82' y1='18' x2='64' y2='36' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='36' y1='64' x2='18' y2='82' stroke='%23fff' stroke-width='5' stroke-linecap='round'/></svg>">
-
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%231B6B3A'/><circle cx='50' cy='50' r='16' fill='%23fff'/><circle cx='50' cy='50' r='8' fill='%231B6B3A'/><line x1='50' y1='5' x2='50' y2='30' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='50' y1='70' x2='50' y2='95' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='5' y1='50' x2='30' y2='50' stroke='%23fff' stroke-width='5' stroke-linecap='round'/><line x1='70' y1='50' x2='95' y2='50' stroke='%23fff' stroke-width='5' stroke-linecap='round'/></svg>">
 <style>
 .ico{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle}
 .ico svg{width:1em;height:1em;stroke:currentColor}
-.nav-btn .ico svg{width:24px;height:24px}
+.nav-btn .ico svg{width:22px;height:22px}
 .tico .ico svg{width:14px;height:14px}
 .back-btn .ico svg{width:24px;height:24px}
 .add-btn .ico svg{width:18px;height:18px}
@@ -160,7 +173,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 .frow-l .ico svg{width:17px;height:17px}
 .pi-name .ico svg{width:15px;height:15px}
 .trow-l .ico svg{width:14px;height:14px}
-.topbar .ico svg{width:15px;height:15px}
+.choice-ico .ico svg{width:22px;height:22px}
 .empty .ico svg{width:40px;height:40px}
 </style>
 </head>
@@ -175,10 +188,11 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
   </div>
   <div class="content" id="content"></div>
   <div class="nav">
-    <button class="nav-btn active" id="nb-dash" onclick="go('dash')"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></svg></span>Главная</button>
-    <button class="nav-btn" id="nb-history" onclick="go('history')"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></svg></span>История</button>
-    <button class="nav-btn" id="nb-add" onclick="go('add')"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg></span>Смена</button>
-    <button class="nav-btn" id="nb-settings" onclick="go('settings')"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></svg></span>Настройки</button>
+    <button class="nav-btn active" id="nb-dash" onclick="go('dash')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></svg></span>Главная</button>
+    <button class="nav-btn" id="nb-history" onclick="go('history')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></svg></span>История</button>
+    <button class="nav-btn" id="nb-add" onclick="go('add')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg></span>Добавить</button>
+    <button class="nav-btn" id="nb-stats" onclick="go('stats')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v5a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M9 8m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v9a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/><path d="M15 4m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v13a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z"/></svg></span>Статистика</button>
+    <button class="nav-btn" id="nb-settings" onclick="go('settings')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.325 4.317c.426 -1.756 2.924 -1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543 -.94 3.31 .826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756 .426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543 -.826 3.31 -2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756 -2.924 1.756 -3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543 .94 -3.31 -.826 -2.37 -2.37a1.724 1.724 0 0 0 -1.065 -2.572c-1.756 -.426 -1.756 -2.924 0 -3.35a1.724 1.724 0 0 0 1.066 -2.573c-.94 -1.543 .826 -3.31 2.37 -2.37c1 .608 2.296 .07 2.572 -1.065z"/><path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></svg></span>Настройки</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -191,60 +205,101 @@ function loadCfg(){try{const c=JSON.parse(localStorage.getItem('cfg')||'{}');CFG
 function saveCfg(){localStorage.setItem('cfg',JSON.stringify(CFG));}
 function loadShifts(){try{return JSON.parse(localStorage.getItem('shifts')||'[]');}catch(e){return[];}}
 function saveShifts(s){localStorage.setItem('shifts',JSON.stringify(s));}
+function loadFundExpenses(){try{return JSON.parse(localStorage.getItem('fundExpenses')||'[]');}catch(e){return[];}}
+function saveFundExpenses(e){localStorage.setItem('fundExpenses',JSON.stringify(e));}
 
-function calc(g,fu,fo,r,m){
-  const n=g-fu-fo-r;
+function calc(g,fu,fo,m){
+  const n=g-fu-fo;
   const rp=Math.round(n*CFG.pctRepair/100);
   const pi=Math.round(n*CFG.pctPillow/100);
   const ca=Math.round(n*CFG.pctCar/100);
   return{net:n,repair:rp,pillow:pi,car:ca,mine:n-rp-pi-ca-m};
 }
-function fmt(n){return Math.round(n).toLocaleString('ru-RU')+'\u00a0₽';}
+function fmt(n){return Math.round(n).toLocaleString('ru-RU')+' ₽';}
 function fmtD(d){return new Date(d+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short',weekday:'short'});}
+function fundName(f){return f==='repair'?'Ремонтный фонд':f==='pillow'?'Подушка':f==='car'?'На машину':f;}
+function fundColor(f){return f==='repair'?'var(--yellow)':f==='pillow'?'var(--blue)':f==='car'?'var(--purple)':'var(--text)';}
+function fundBg(f){return f==='repair'?'var(--yellow-lt)':f==='pillow'?'var(--blue-lt)':f==='car'?'var(--purple-lt)':'var(--bg3)';}
+function pluralM(n){if(n%10===1&&n%100!==11)return'месяц';if([2,3,4].includes(n%10)&&![12,13,14].includes(n%100))return'месяца';return'месяцев';}
 
 let cur='dash';
+let statYear=new Date().getFullYear();
+let statMonth=new Date().getMonth();
 loadCfg();
 
 function go(tab){
   cur=tab;
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const nb=document.getElementById('nb-'+tab);
+  const map={dash:'nb-dash',history:'nb-history',add:'nb-add','add-shift':'nb-add','add-expense':'nb-add',stats:'nb-stats',settings:'nb-settings'};
+  const nb=document.getElementById(map[tab]);
   if(nb)nb.classList.add('active');
   render();
 }
 
 function render(){
   const now=new Date();
-  document.getElementById('top-date').innerHTML=
-    now.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+'<br>'+
-    now.toLocaleDateString('ru-RU',{weekday:'short'});
+  document.getElementById('top-date').innerHTML=now.toLocaleDateString('ru-RU',{day:'numeric',month:'short'})+'<br>'+now.toLocaleDateString('ru-RU',{weekday:'short'});
   const c=document.getElementById('content');
   c.innerHTML='';
   if(cur==='dash')renderDash(c);
   else if(cur==='history')renderHistory(c);
   else if(cur==='add')renderAdd(c);
+  else if(cur==='add-shift')renderAddShift(c);
+  else if(cur==='add-expense')renderAddExpense(c);
+  else if(cur==='stats')renderStats(c);
   else if(cur==='settings')renderSettings(c);
+}
+
+function getDreamDate(shifts,fundExpenses){
+  if(!CFG.goalCar||CFG.goalCar<=0)return null;
+  const totalCarSaved=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).car,0);
+  const totalCarSpent=fundExpenses.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
+  const carBalance=totalCarSaved-totalCarSpent;
+  const remaining=CFG.goalCar-carBalance;
+  if(remaining<=0)return{done:true};
+  const monthData={};
+  shifts.forEach(s=>{const ym=s.date.slice(0,7);if(!monthData[ym])monthData[ym]=0;monthData[ym]+=calc(s.gross,s.fuel,s.food,s.mom).car;});
+  const months=Object.values(monthData);
+  if(!months.length)return null;
+  const recent=months.slice(-3);
+  const avg=recent.reduce((a,b)=>a+b,0)/recent.length;
+  if(avg<=0)return null;
+  const mLeft=Math.ceil(remaining/avg);
+  const now=new Date();
+  const target=new Date(now.getFullYear(),now.getMonth()+mLeft,1);
+  const mn=['январе','феврале','марте','апреле','мае','июне','июле','августе','сентябре','октябре','ноябре','декабре'];
+  return{done:false,monthsLeft:mLeft,label:'в '+mn[target.getMonth()]+' '+target.getFullYear()};
 }
 
 function renderDash(c){
   const shifts=loadShifts();
+  const fundExpenses=loadFundExpenses();
   const last=shifts[shifts.length-1];
   const now=new Date();
   const ym=now.toISOString().slice(0,7);
   const thisMonth=shifts.filter(s=>s.date&&s.date.slice(0,7)===ym);
   const worked=thisMonth.length;
-  const monthNet=thisMonth.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.repair,s.mom).net,0);
+  const monthNet=thisMonth.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).net,0);
   const goalPct=CFG.goalMonth>0?Math.round(monthNet/CFG.goalMonth*100):0;
+
   const totalPaid=shifts.reduce((a,s)=>a+(s.mom||0),0);
-  const totalRepair=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.repair,s.mom).repair,0);
-  const totalPillow=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.repair,s.mom).pillow,0);
-  const totalCar=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.repair,s.mom).car,0);
-  const avgNet=shifts.length>0?shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.repair,s.mom).net,0)/shifts.length:0;
+  const totalRepairAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).repair,0);
+  const totalPillowAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).pillow,0);
+  const totalCarAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).car,0);
+  const repairSpent=fundExpenses.filter(e=>e.fund==='repair').reduce((a,e)=>a+e.amount,0);
+  const pillowSpent=fundExpenses.filter(e=>e.fund==='pillow').reduce((a,e)=>a+e.amount,0);
+  const carSpent=fundExpenses.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
+  const totalRepair=totalRepairAcc-repairSpent;
+  const totalPillow=totalPillowAcc-pillowSpent;
+  const totalCar=totalCarAcc-carSpent;
+  const avgNet=shifts.length>0?shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).net,0)/shifts.length:0;
+
+  const dream=getDreamDate(shifts,fundExpenses);
 
   let mineVal='—',mineSub='Добавь первую смену';
   let transfers=[];
   if(last){
-    const lc=calc(last.gross,last.fuel,last.food,last.repair,last.mom);
+    const lc=calc(last.gross,last.fuel,last.food,last.mom);
     mineVal=fmt(lc.mine);
     mineSub='Смена '+fmtD(last.date);
     transfers=[
@@ -274,12 +329,25 @@ function renderDash(c){
 
   const el=document.createElement('div');
   el.style.cssText='display:flex;flex-direction:column;gap:10px;width:100%';
+
+  let dreamHtml='';
+  if(dream&&!dream.done){
+    dreamHtml=`<div class="card dream">
+      <div class="lbl w">Когда куплю машину?</div>
+      <div class="big w">через ${dream.monthsLeft} ${pluralM(dream.monthsLeft)}</div>
+      <div class="sub w">${dream.label} · при текущем темпе</div>
+    </div>`;
+  } else if(dream&&dream.done){
+    dreamHtml=`<div class="card dream"><div class="lbl w">Мечта достигнута!</div><div class="big w">Поздравляем!</div></div>`;
+  }
+
   el.innerHTML=`
     <div class="card green">
       <div class="lbl">Мои деньги · последняя смена</div>
       <div class="big">${mineVal}</div>
       <div class="sub">${mineSub}</div>
     </div>
+    ${dreamHtml}
     ${transfers.length?`
     <div class="sec">Перевести сегодня</div>
     <div class="tlist">${transfers.map(t=>`
@@ -288,10 +356,7 @@ function renderDash(c){
         <div class="trow-r" style="color:${t.c}">${t.v>0?fmt(t.v):'—'}</div>
       </div>`).join('')}</div>`:''}
     <div class="sec">Статус дня</div>
-    <div class="status">
-      <div class="sdot" style="background:${sc}"></div>
-      <div class="stxt" style="color:${sc}">${emoji} ${st}</div>
-    </div>
+    <div class="status"><div class="sdot" style="background:${sc}"></div><div class="stxt" style="color:${sc}">${emoji} ${st}</div></div>
     <div class="sec">Смены месяца</div>
     <div class="g2">
       <div class="met"><div class="met-l">Отработано</div><div class="met-v">${worked} из ${CFG.planShifts}</div></div>
@@ -315,7 +380,7 @@ function renderDash(c){
         <div class="pbar" style="background:${g.bg}"><div class="pbar-fill" style="width:${pct}%;background:${g.c}"></div></div>
         <div class="pi-meta"><span>${fmt(g.acc)} из ${fmt(g.goal)}</span><span>${sl?'~'+sl+' смен':'—'}</span></div>
       </div>`;}).join('')}</div>
-    <button class="add-btn" onclick="go('add')"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg></span>Добавить смену</button>
+    <button class="add-btn" onclick="go('add')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></svg></span>Добавить смену</button>
     <div style="height:4px"></div>
   `;
   c.appendChild(el);
@@ -323,34 +388,273 @@ function renderDash(c){
 
 function renderHistory(c){
   const shifts=loadShifts();
-  const reversed=shifts.slice().reverse();
-  if(!reversed.length){
-    c.innerHTML='<div class="empty"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.422 17.397a2 2 0 0 0 .578 -1.397v-10a2 2 0 0 0 -2 -2h-12c-.549 0 -1.045 .222 -1.405 .582m-1.595 3.418h9"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M6 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M3 3l18 18"/></svg></span>Нет смен.<br>Добавь первую через вкладку «Смена».</div>';
+  const expenses=loadFundExpenses();
+  const items=[
+    ...shifts.map((s,i)=>({type:'shift',data:s,origIdx:i,date:s.date})),
+    ...expenses.map((e,i)=>({type:'expense',data:e,origIdx:i,date:e.date}))
+  ].sort((a,b)=>b.date.localeCompare(a.date));
+
+  if(!items.length){
+    c.innerHTML='<div class="empty"><span class="ico" style="font-size:40px;display:block;margin-bottom:10px;color:var(--text3)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l11 0"/><path d="M9 12l11 0"/><path d="M9 18l11 0"/><path d="M5 6l0 .01"/><path d="M5 12l0 .01"/><path d="M5 18l0 .01"/></svg></span>Нет записей</div>';
     return;
   }
   const el=document.createElement('div');
   el.style.cssText='width:100%';
-  el.innerHTML=reversed.map((s,ri)=>{
-    const x=calc(s.gross,s.fuel,s.food,s.repair,s.mom);
-    const origIdx=shifts.length-1-ri;
-    return`<div class="hcard">
-      <div class="hcard-top">
-        <div class="hcard-date">${fmtD(s.date)}</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <div class="hcard-mine">${fmt(x.mine)}</div>
-          <button class="del-btn" onclick="deleteShift(${origIdx})" title="Удалить смену"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg></button>
+  el.innerHTML=items.map(item=>{
+    if(item.type==='shift'){
+      const s=item.data;
+      const x=calc(s.gross,s.fuel,s.food,s.mom);
+      return`<div class="hcard">
+        <div class="hcard-top">
+          <div class="hcard-date">${fmtD(s.date)}</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="hcard-mine">${fmt(x.mine)}</div>
+            <button class="del-btn" onclick="deleteShift(${item.origIdx})" title="Удалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg></button>
+          </div>
         </div>
-      </div>
-      <div class="hgrid">
-        <span>Грязными: <b>${fmt(s.gross)}</b></span>
-        <span>Чистыми: <b>${fmt(x.net)}</b></span>
-        <span>Бензин: <b>${fmt(s.fuel)}</b></span>
-        <span>Маме: <b>${fmt(s.mom)}</b></span>
-        <span>Ремонт: <b>${fmt(s.repair)}</b></span>
-        <span>Подушка: <b>${fmt(x.pillow)}</b></span>
-      </div>
-    </div>`;}).join('');
+        <div class="hgrid">
+          <span>Грязными: <b>${fmt(s.gross)}</b></span>
+          <span>Чистыми: <b>${fmt(x.net)}</b></span>
+          <span>Бензин: <b>${fmt(s.fuel)}</b></span>
+          <span>Маме: <b>${fmt(s.mom)}</b></span>
+          <span>Ремфонд: <b>${fmt(x.repair)}</b></span>
+          <span>Подушка: <b>${fmt(x.pillow)}</b></span>
+        </div>
+      </div>`;
+    } else {
+      const e=item.data;
+      return`<div class="hcard expense">
+        <div class="hcard-top">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="hcard-date">${fmtD(e.date)}</div>
+            <span class="hcard-badge">расход из фонда</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="hcard-mine exp">−${fmt(e.amount)}</div>
+            <button class="del-btn" onclick="deleteFundExpense(${item.origIdx})" title="Удалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg></button>
+          </div>
+        </div>
+        <div class="hgrid">
+          <span>Фонд: <b style="color:${fundColor(e.fund)}">${fundName(e.fund)}</b></span>
+          ${e.note?`<span>Комментарий: <b>${e.note}</b></span>`:''}
+        </div>
+      </div>`;
+    }
+  }).join('');
   c.appendChild(el);
+}
+
+function renderAdd(c){
+  const el=document.createElement('div');
+  el.style.cssText='width:100%;padding-bottom:20px';
+  el.innerHTML=`
+    <div class="fhd" style="padding-top:14px"><h2>Что добавляем?</h2></div>
+    <div class="choice-wrap">
+      <button class="choice-btn" onclick="go('add-shift')">
+        <div class="choice-ico" style="background:var(--green-lt)"><span class="ico" style="color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 17m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M5 17h-2v-6l2 -5h9l4 4h1a2 2 0 0 1 2 2v5h-2m-4 0h-6m-6 -6h15m-6 0v-5"/></svg></span></div>
+        <div><div class="choice-t">Новая смена</div><div class="choice-s">Доход за рабочий день</div></div>
+      </button>
+      <button class="choice-btn" onclick="go('add-expense')">
+        <div class="choice-ico" style="background:var(--orange-lt)"><span class="ico" style="color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5"/></svg></span></div>
+        <div><div class="choice-t">Расход из фонда</div><div class="choice-s">Потратил накопленное (ремонт и т.д.)</div></div>
+      </button>
+    </div>
+  `;
+  c.appendChild(el);
+}
+
+function renderAddShift(c){
+  const today=new Date().toISOString().slice(0,10);
+  const el=document.createElement('div');
+  el.style.cssText='width:100%;padding-bottom:20px';
+  el.innerHTML=`
+    <div class="fhd">
+      <button class="back-btn" onclick="go('add')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg></span></button>
+      <h2>Новая смена</h2>
+    </div>
+    <div class="fgrp">
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg></span>Дата</div><input class="finp" type="date" id="fd" value="${today}" style="width:150px;font-size:14px"></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2"/></svg></span>Грязными</div><input class="finp" type="number" id="fg" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 11h1a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0v-7l-3 -3"/><path d="M4 20v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v14"/><path d="M3 20h11"/><path d="M18 7v1a1 1 0 0 0 1 1h1"/><path d="M4 11h10"/></svg></span>Бензин</div><input class="finp" type="number" id="ff" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"/><path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"/></svg></span>Еда</div><input class="finp" type="number" id="fe" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566"/></svg></span>Маме</div><input class="finp" type="number" id="fm" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
+    </div>
+    <div class="prev" id="prev" style="display:none">
+      <div class="prev-t">Итог смены</div>
+      <div id="prev-rows"></div>
+    </div>
+    <button class="save-btn" onclick="saveShift()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>Сохранить смену</button>
+  `;
+  c.appendChild(el);
+  ['fg','ff','fe','fm'].forEach(id=>document.getElementById(id).addEventListener('input',updPrev));
+}
+
+function renderAddExpense(c){
+  const today=new Date().toISOString().slice(0,10);
+  const el=document.createElement('div');
+  el.style.cssText='width:100%;padding-bottom:20px';
+  el.innerHTML=`
+    <div class="fhd">
+      <button class="back-btn" onclick="go('add')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg></span></button>
+      <h2>Расход из фонда</h2>
+    </div>
+    <div class="fgrp">
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg></span>Дата</div><input class="finp" type="date" id="ex-date" value="${today}" style="width:150px;font-size:14px"></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></svg></span>Фонд</div>
+        <select class="fsel" id="ex-fund">
+          <option value="repair">Ремонтный фонд</option>
+          <option value="pillow">Подушка</option>
+          <option value="car">На машину</option>
+        </select>
+      </div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2"/></svg></span>Сумма</div><input class="finp" type="number" id="ex-amount" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg></span>Комментарий</div><input class="finp" type="text" id="ex-note" placeholder="необязательно"></div>
+    </div>
+    <button class="save-btn" style="background:var(--orange)" onclick="saveFundExpense()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>Сохранить расход</button>
+  `;
+  c.appendChild(el);
+}
+
+function renderStats(c){
+  const shifts=loadShifts();
+  const fundExpenses=loadFundExpenses();
+  const ym=statYear+'-'+String(statMonth+1).padStart(2,'0');
+  const monthShifts=shifts.filter(s=>s.date.slice(0,7)===ym);
+  const monthExp=fundExpenses.filter(e=>e.date.slice(0,7)===ym);
+
+  const totalGross=monthShifts.reduce((a,s)=>a+s.gross,0);
+  const totalFuel=monthShifts.reduce((a,s)=>a+s.fuel,0);
+  const totalFood=monthShifts.reduce((a,s)=>a+s.food,0);
+  const totalNet=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).net,0);
+  const totalRepF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).repair,0);
+  const totalPilF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).pillow,0);
+  const totalCarF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).car,0);
+  const totalMom=monthShifts.reduce((a,s)=>a+(s.mom||0),0);
+  const totalMine=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).mine,0);
+  const repExp=monthExp.filter(e=>e.fund==='repair').reduce((a,e)=>a+e.amount,0);
+  const pilExp=monthExp.filter(e=>e.fund==='pillow').reduce((a,e)=>a+e.amount,0);
+  const carExp=monthExp.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
+
+  const mNames=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  const mLabel=mNames[statMonth]+' '+statYear;
+  const now=new Date();
+  const isNow=ym===now.toISOString().slice(0,7);
+  const canNext=!(statYear===now.getFullYear()&&statMonth===now.getMonth());
+
+  // Records
+  let bestShift=null;
+  shifts.forEach(s=>{
+    const mine=calc(s.gross,s.fuel,s.food,s.mom).mine;
+    if(!bestShift||mine>calc(bestShift.gross,bestShift.fuel,bestShift.food,bestShift.mom).mine)bestShift=s;
+  });
+  const monthNetMap={};
+  shifts.forEach(s=>{const m=s.date.slice(0,7);if(!monthNetMap[m])monthNetMap[m]=0;monthNetMap[m]+=calc(s.gross,s.fuel,s.food,s.mom).net;});
+  const bestMonthEntry=Object.entries(monthNetMap).sort((a,b)=>b[1]-a[1])[0];
+  const uniqueDates=[...new Set(shifts.map(s=>s.date))].sort();
+  let maxStreak=uniqueDates.length>0?1:0,curStr=1;
+  for(let i=1;i<uniqueDates.length;i++){
+    const diff=(new Date(uniqueDates[i]+'T12:00:00')-new Date(uniqueDates[i-1]+'T12:00:00'))/86400000;
+    if(diff===1){curStr++;maxStreak=Math.max(maxStreak,curStr);}else curStr=1;
+  }
+
+  const bestShiftVal=bestShift?calc(bestShift.gross,bestShift.fuel,bestShift.food,bestShift.mom).mine:0;
+  const bestMonthVal=bestMonthEntry?bestMonthEntry[1]:0;
+  const bestMonthLbl=bestMonthEntry?mNames[parseInt(bestMonthEntry[0].slice(5))-1]+' '+bestMonthEntry[0].slice(0,4):'—';
+
+  const el=document.createElement('div');
+  el.style.cssText='display:flex;flex-direction:column;gap:10px;width:100%';
+  el.innerHTML=`
+    <div class="stat-nav">
+      <button onclick="statPrev()">‹</button>
+      <span>${mLabel}${isNow?' · сейчас':''}</span>
+      <button onclick="statNext()" style="opacity:${canNext?1:.3}">${canNext?'›':''}</button>
+    </div>
+    ${monthShifts.length===0?`<div class="empty" style="padding:32px 0">Нет смен за этот период</div>`:`
+    <div class="sec">Доходы и расходы</div>
+    <div class="stat-block">
+      <div class="stat-row"><span class="stat-lbl">Смен отработано</span><span class="stat-val">${monthShifts.length}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Валовой доход</span><span class="stat-val">${fmt(totalGross)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Бензин</span><span class="stat-val r">−${fmt(totalFuel)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Еда</span><span class="stat-val r">−${fmt(totalFood)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Чистый доход</span><span class="stat-val g">${fmt(totalNet)}</span></div>
+    </div>
+    <div class="sec">Инвестировано</div>
+    <div class="stat-block">
+      <div class="stat-row"><span class="stat-lbl">Ремонтный фонд</span><span class="stat-val" style="color:#BF360C">+${fmt(totalRepF)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Подушка</span><span class="stat-val" style="color:var(--blue)">+${fmt(totalPilF)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">На машину</span><span class="stat-val" style="color:var(--purple)">+${fmt(totalCarF)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Маме</span><span class="stat-val" style="color:var(--red)">+${fmt(totalMom)}</span></div>
+      <div class="stat-row"><span class="stat-lbl">Мои деньги</span><span class="stat-val g">${fmt(totalMine)}</span></div>
+    </div>
+    ${(repExp+pilExp+carExp)>0?`
+    <div class="sec">Расходы из фондов</div>
+    <div class="stat-block">
+      ${repExp>0?`<div class="stat-row"><span class="stat-lbl">Ремонтный фонд</span><span class="stat-val o">−${fmt(repExp)}</span></div>`:''}
+      ${pilExp>0?`<div class="stat-row"><span class="stat-lbl">Подушка</span><span class="stat-val o">−${fmt(pilExp)}</span></div>`:''}
+      ${carExp>0?`<div class="stat-row"><span class="stat-lbl">На машину</span><span class="stat-val o">−${fmt(carExp)}</span></div>`:''}
+    </div>`:''}
+    `}
+    <div class="sec">Рекорды за всё время</div>
+    <div class="rec-grid">
+      <div class="rec-card"><div class="rec-v">${bestShift?fmt(bestShiftVal):'—'}</div><div class="rec-l">Лучшая смена</div></div>
+      <div class="rec-card"><div class="rec-v">${bestMonthEntry?fmt(bestMonthVal):'—'}</div><div class="rec-l">Лучший месяц</div><div class="rec-l" style="margin-top:1px">${bestMonthLbl}</div></div>
+      <div class="rec-card"><div class="rec-v">${maxStreak}</div><div class="rec-l">${maxStreak===1?'день подряд':maxStreak<5?'дня подряд':'дней подряд'}</div></div>
+    </div>
+    <div style="height:4px"></div>
+  `;
+  c.appendChild(el);
+}
+
+function statPrev(){statMonth--;if(statMonth<0){statMonth=11;statYear--;}render();}
+function statNext(){
+  const now=new Date();
+  if(statYear===now.getFullYear()&&statMonth===now.getMonth())return;
+  statMonth++;if(statMonth>11){statMonth=0;statYear++;}render();
+}
+
+function updPrev(){
+  const g=+document.getElementById('fg').value||0;
+  if(!g){document.getElementById('prev').style.display='none';return;}
+  const x=calc(g,+document.getElementById('ff').value||0,+document.getElementById('fe').value||0,+document.getElementById('fm').value||0);
+  const rows=[['Чистыми',x.net],['Ремонт. фонд',x.repair],['Подушка',x.pillow],['Маме',+document.getElementById('fm').value||0],['Мои деньги',x.mine]];
+  document.getElementById('prev-rows').innerHTML=rows.map(r=>`<div class="prev-row"><span>${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('');
+  document.getElementById('prev').style.display='block';
+}
+
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwDP0zJWs9Q1f-b3jD3f6sPI8NL6NcJXOMiFHP4iriT0mr8fbEPl7hTI8I4J9p0wvzP/exec';
+
+function saveShift(){
+  const date=document.getElementById('fd').value;
+  const gross=+document.getElementById('fg').value||0;
+  if(!date||!gross){showToast('Укажи дату и выручку');return;}
+  const shift={date,gross,fuel:+document.getElementById('ff').value||0,food:+document.getElementById('fe').value||0,mom:+document.getElementById('fm').value||0};
+  const shifts=loadShifts();
+  shifts.push(shift);
+  saveShifts(shifts);
+  showToast('Сохраняю...');
+  const params=new URLSearchParams({date:shift.date,gross:shift.gross,fuel:shift.fuel,food:shift.food,mom:shift.mom});
+  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
+    .then(()=>showToast('Смена сохранена ✓'))
+    .catch(()=>showToast('Сохранено локально'));
+  setTimeout(()=>go('dash'),600);
+}
+
+function saveFundExpense(){
+  const date=document.getElementById('ex-date').value;
+  const fund=document.getElementById('ex-fund').value;
+  const amount=+document.getElementById('ex-amount').value||0;
+  const note=document.getElementById('ex-note').value.trim();
+  if(!date||!amount){showToast('Укажи дату и сумму');return;}
+  const exp={date,fund,amount,note};
+  const expenses=loadFundExpenses();
+  expenses.push(exp);
+  saveFundExpenses(expenses);
+  showToast('Сохраняю...');
+  const params=new URLSearchParams({action:'save_fund_expense',date,fund,amount,note});
+  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
+    .then(()=>showToast('Расход сохранён ✓'))
+    .catch(()=>showToast('Сохранено локально'));
+  setTimeout(()=>go('dash'),600);
 }
 
 function deleteShift(idx){
@@ -365,60 +669,16 @@ function deleteShift(idx){
   render();
 }
 
-function renderAdd(c){
-  const today=new Date().toISOString().slice(0,10);
-  const el=document.createElement('div');
-  el.style.cssText='width:100%;padding-bottom:20px';
-  el.innerHTML=`
-    <div class="fhd">
-      <button class="back-btn" onclick="go('dash')"><span class="ico" style="font-size:24px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg></span></button>
-      <h2>Новая смена</h2>
-    </div>
-    <div class="fgrp">
-      <div class="frow"><div class="frow-l"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M11 15h1"/><path d="M12 15v3"/></svg></span>Дата</div><input class="finp" type="date" id="fd" value="${today}" style="width:150px;font-size:14px"></div>
-      <div class="frow"><div class="frow-l"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2"/></svg></span>Грязными</div><input class="finp" type="number" id="fg" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
-      <div class="frow"><div class="frow-l"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 11h1a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0v-7l-3 -3"/><path d="M4 20v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v14"/><path d="M3 20h11"/><path d="M18 7v1a1 1 0 0 0 1 1h1"/><path d="M4 11h10"/></svg></span>Бензин</div><input class="finp" type="number" id="ff" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
-      <div class="frow"><div class="frow-l"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"/><path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"/><path d="M16.746 16.726a3 3 0 1 0 .252 -5.555"/></svg></span>Еда</div><input class="finp" type="number" id="fe" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
-      <div class="frow"><div class="frow-l"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5"/></svg></span>Ремонт</div><input class="finp" type="number" id="fr" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
-      <div class="frow"><div class="frow-l"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566"/></svg></span>Маме</div><input class="finp" type="number" id="fm" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
-    </div>
-    <div class="prev" id="prev" style="display:none">
-      <div class="prev-t">Итог смены</div>
-      <div id="prev-rows"></div>
-    </div>
-    <button class="save-btn" onclick="saveShift()"><span class="ico" style=""><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>Сохранить смену</button>
-  `;
-  c.appendChild(el);
-  ['fg','ff','fe','fr','fm'].forEach(id=>{
-    document.getElementById(id).addEventListener('input',updPrev);
-  });
-}
-
-function updPrev(){
-  const g=+document.getElementById('fg').value||0;
-  if(!g){document.getElementById('prev').style.display='none';return;}
-  const x=calc(g,+document.getElementById('ff').value||0,+document.getElementById('fe').value||0,+document.getElementById('fr').value||0,+document.getElementById('fm').value||0);
-  const rows=[['Чистыми',x.net],['Ремонт. фонд',x.repair],['Подушка',x.pillow],['Маме',+document.getElementById('fm').value||0],['Мои деньги',x.mine]];
-  document.getElementById('prev-rows').innerHTML=rows.map(r=>`<div class="prev-row"><span>${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('');
-  document.getElementById('prev').style.display='block';
-}
-
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbz-VCJZhwTIPWIFG3ptKgELM_6Q_KVljSJehTEm0IiW0CTHYgw0xA2HDdK7OGA8tU5H/exec';
-
-function saveShift(){
-  const date=document.getElementById('fd').value;
-  const gross=+document.getElementById('fg').value||0;
-  if(!date||!gross){showToast('Укажи дату и выручку');return;}
-  const shift={date,gross,fuel:+document.getElementById('ff').value||0,food:+document.getElementById('fe').value||0,repair:+document.getElementById('fr').value||0,mom:+document.getElementById('fm').value||0};
-  const shifts=loadShifts();
-  shifts.push(shift);
-  saveShifts(shifts);
-  showToast('Сохраняю...');
-  const params=new URLSearchParams({date:shift.date,gross:shift.gross,fuel:shift.fuel,food:shift.food,repair:shift.repair,mom:shift.mom});
-  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
-    .then(()=>showToast('Смена сохранена в таблицу ✓'))
-    .catch(()=>showToast('Сохранено локально (нет связи)'));
-  setTimeout(()=>go('dash'),600);
+function deleteFundExpense(idx){
+  if(!confirm('Удалить этот расход?'))return;
+  const expenses=loadFundExpenses();
+  const exp=expenses[idx];
+  expenses.splice(idx,1);
+  saveFundExpenses(expenses);
+  const params=new URLSearchParams({action:'delete_fund_expense',date:exp.date,fund:exp.fund,amount:exp.amount});
+  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'}).catch(()=>{});
+  showToast('Расход удалён');
+  render();
 }
 
 function renderSettings(c){
@@ -468,7 +728,6 @@ function saveCfgForm(){
   showToast('Настройки сохранены');
 }
 
-
 function getIcon(name){
   const icons={
     'ti-tool':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5"/></svg>',
@@ -490,13 +749,8 @@ function loadCfgFromSheets(){
   const cbName='_cfg'+Date.now();
   const s=document.createElement('script');
   window[cbName]=function(data){
-    if(data&&typeof data==='object'&&Object.keys(data).length>0){
-      CFG=Object.assign({},DEF_CFG,data);
-      saveCfg();
-      render();
-    }
-    delete window[cbName];
-    if(s.parentNode)s.parentNode.removeChild(s);
+    if(data&&typeof data==='object'&&Object.keys(data).length>0){CFG=Object.assign({},DEF_CFG,data);saveCfg();render();}
+    delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);
   };
   s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
   s.src=SCRIPT_URL+'?action=get_settings&callback='+cbName;
@@ -512,21 +766,30 @@ function loadShiftsFromSheets(){
   const cbName='_shifts'+Date.now();
   const s=document.createElement('script');
   window[cbName]=function(data){
-    if(Array.isArray(data)&&data.length>0){
-      saveShifts(data);
-      render();
-    }
-    delete window[cbName];
-    if(s.parentNode)s.parentNode.removeChild(s);
+    if(Array.isArray(data)&&data.length>0){saveShifts(data);render();}
+    delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);
   };
   s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
   s.src=SCRIPT_URL+'?action=get_shifts&callback='+cbName;
   document.body.appendChild(s);
 }
 
+function loadFundExpensesFromSheets(){
+  const cbName='_exp'+Date.now();
+  const s=document.createElement('script');
+  window[cbName]=function(data){
+    if(Array.isArray(data)&&data.length>0){saveFundExpenses(data);render();}
+    delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);
+  };
+  s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
+  s.src=SCRIPT_URL+'?action=get_fund_expenses&callback='+cbName;
+  document.body.appendChild(s);
+}
+
 render();
 loadCfgFromSheets();
 loadShiftsFromSheets();
+loadFundExpensesFromSheets();
 </script>
 </body>
 </html>
