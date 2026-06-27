@@ -524,8 +524,13 @@ function renderAddShift(c){
       <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"/><path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"/></svg></span>Еда</div><input class="finp" type="number" id="fe" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
     </div>
     <div class="prev" id="prev" style="display:none">
-      <div class="prev-t">Итог смены</div>
-      <div id="prev-rows"></div>
+      <div class="prev-t">Итог смены <small style="font-size:11px;font-weight:400;color:var(--text3)">· суммы можно изменить</small></div>
+      <div class="prev-row"><span>Чистыми</span><span id="pi-net" style="font-weight:600">—</span></div>
+      ${CFG.pctMom>0?`<div class="prev-row"><span style="color:var(--text2)">→ Маме</span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-mom" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>`:''}
+      ${CFG.pctRepair>0?`<div class="prev-row"><span style="color:var(--text2)">→ Ремфонд</span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-rep" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>`:''}
+      ${CFG.pctPillow>0?`<div class="prev-row"><span style="color:var(--text2)">→ Подушка</span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-pil" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>`:''}
+      ${CFG.pctCar>0?`<div class="prev-row"><span style="color:var(--text2)">→ Машина</span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-car" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>`:''}
+      <div class="prev-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:6px"><span><b>Мои деньги</b></span><span id="pi-mine" style="font-weight:700;color:var(--green)">—</span></div>
     </div>
     <button class="save-btn" onclick="saveShift()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>Сохранить смену</button>
   `;
@@ -661,14 +666,24 @@ function updPrev(){
   const g=+document.getElementById('fg').value||0;
   if(!g){document.getElementById('prev').style.display='none';return;}
   const x=calc(g,+document.getElementById('ff').value||0,+document.getElementById('fe').value||0);
-  const rows=[['Чистыми',x.net]];
-  if(x.mom>0)rows.push(['→ Маме',x.mom]);
-  if(x.repair>0)rows.push(['→ Ремфонд',x.repair]);
-  if(x.pillow>0)rows.push(['→ Подушка',x.pillow]);
-  if(x.car>0)rows.push(['→ На машину',x.car]);
-  rows.push(['Мои деньги',x.mine]);
-  document.getElementById('prev-rows').innerHTML=rows.map(r=>`<div class="prev-row"><span>${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('');
+  const netEl=document.getElementById('pi-net');if(netEl)netEl.textContent=fmt(x.net)+' ₽';
+  const fi=document.getElementById('fi-mom');if(fi)fi.value=x.mom||0;
+  const fr=document.getElementById('fi-rep');if(fr)fr.value=x.repair||0;
+  const fp=document.getElementById('fi-pil');if(fp)fp.value=x.pillow||0;
+  const fc=document.getElementById('fi-car');if(fc)fc.value=x.car||0;
+  updMine();
   document.getElementById('prev').style.display='block';
+}
+function updMine(){
+  const g=+document.getElementById('fg').value||0;
+  const net=g-(+document.getElementById('ff').value||0)-(+document.getElementById('fe').value||0);
+  const mom=+((document.getElementById('fi-mom')||{}).value)||0;
+  const rep=+((document.getElementById('fi-rep')||{}).value)||0;
+  const pil=+((document.getElementById('fi-pil')||{}).value)||0;
+  const car=+((document.getElementById('fi-car')||{}).value)||0;
+  const mine=net-mom-rep-pil-car;
+  const el=document.getElementById('pi-mine');
+  if(el){el.textContent=fmt(mine)+' ₽';el.style.color=mine<0?'var(--red)':'var(--green)';}
 }
 
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzJXvUBybQb1mWZnnenX9rEdREUuKMpmtlP3fVhrnO4LDCr7OC4PgAklsLwvgQw_drx/exec';
@@ -679,13 +694,18 @@ function saveShift(){
   if(!date||!gross){showToast('Укажи дату и выручку');return;}
   const fuel=+document.getElementById('ff').value||0;
   const food=+document.getElementById('fe').value||0;
-  const lc=calc(gross,fuel,food);
-  const shift={date,gross,fuel,food,mom:lc.mom,repair:lc.repair,pillow:lc.pillow,car:lc.car,net:lc.net,mine:lc.mine};
+  const net=gross-fuel-food;
+  const mom=+((document.getElementById('fi-mom')||{}).value)||0;
+  const repair=+((document.getElementById('fi-rep')||{}).value)||0;
+  const pillow=+((document.getElementById('fi-pil')||{}).value)||0;
+  const car=+((document.getElementById('fi-car')||{}).value)||0;
+  const mine=net-mom-repair-pillow-car;
+  const shift={date,gross,fuel,food,mom,repair,pillow,car,net,mine};
   const shifts=loadShifts();
   shifts.push(shift);
   saveShifts(shifts);
   showToast('Сохраняю...');
-  const params=new URLSearchParams({date:shift.date,gross:shift.gross,fuel:shift.fuel,food:shift.food,mom:lc.mom,repair:lc.repair,pillow:lc.pillow,car:lc.car,net:lc.net,mine:lc.mine});
+  const params=new URLSearchParams({date,gross,fuel,food,mom,repair,pillow,car,net,mine});
   fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
     .then(()=>showToast('Смена сохранена ✓'))
     .catch(()=>showToast('Сохранено локально'));
