@@ -278,7 +278,7 @@ function renderDash(c){
   const goalPct=CFG.goalMonth>0?Math.round(monthNet/CFG.goalMonth*100):0;
 
   const fundDeposits=loadFundDeposits();
-  const totalMomAcc=(CFG.initMom||0)+shifts.reduce((a,s)=>a+(typeof s.mom!=='undefined'?s.mom:calc(s.gross,s.fuel,s.food).mom),0)+fundDeposits.filter(d=>d.fund==='mom').reduce((a,d)=>a+d.amount,0);
+  const totalMomAcc=(CFG.initMom||0)+shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).mom,0)+fundDeposits.filter(d=>d.fund==='mom').reduce((a,d)=>a+d.amount,0);
   const momSpent=fundExpenses.filter(e=>e.fund==='mom').reduce((a,e)=>a+e.amount,0);
   const totalPaid=totalMomAcc-momSpent;
   const totalRepairAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).repair,0);
@@ -570,7 +570,7 @@ function renderStats(c){
   const totalRepF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).repair,0);
   const totalPilF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).pillow,0);
   const totalCarF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).car,0);
-  const totalMom=monthShifts.reduce((a,s)=>a+(typeof s.mom!=='undefined'?s.mom:calc(s.gross,s.fuel,s.food).mom),0);
+  const totalMom=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).mom,0);
   const totalMine=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).mine,0);
   const repExp=monthExp.filter(e=>e.fund==='repair').reduce((a,e)=>a+e.amount,0);
   const pilExp=monthExp.filter(e=>e.fund==='pillow').reduce((a,e)=>a+e.amount,0);
@@ -674,11 +674,12 @@ function saveShift(){
   const gross=+document.getElementById('fg').value||0;
   if(!date||!gross){showToast('Укажи дату и выручку');return;}
   const shift={date,gross,fuel:+document.getElementById('ff').value||0,food:+document.getElementById('fe').value||0};
+  const lc=calc(shift.gross,shift.fuel,shift.food);
   const shifts=loadShifts();
   shifts.push(shift);
   saveShifts(shifts);
   showToast('Сохраняю...');
-  const params=new URLSearchParams({date:shift.date,gross:shift.gross,fuel:shift.fuel,food:shift.food,mom:0});
+  const params=new URLSearchParams({date:shift.date,gross:shift.gross,fuel:shift.fuel,food:shift.food,mom:lc.mom,repair:lc.repair,pillow:lc.pillow,car:lc.car,net:lc.net,mine:lc.mine});
   fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
     .then(()=>showToast('Смена сохранена ✓'))
     .catch(()=>showToast('Сохранено локально'));
