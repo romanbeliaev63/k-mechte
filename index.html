@@ -300,14 +300,16 @@ function renderDash(c){
   let mineVal='—',mineSub='Добавь первую смену';
   let transfers=[];
   if(last){
-    mineVal=fmt(last.mine||0);
+    const lastNet=last.net||(last.gross-last.fuel-last.food);
+    const lastMine=lastNet-(last.mom||0)-(last.repair||0)-(last.pillow||0)-(last.car||0);
+    mineVal=fmt(lastMine);
     mineSub='Смена '+fmtD(last.date);
     transfers=[
       {icon:'ti-tool',l:'Ремонт. фонд',v:last.repair||0,bg:'var(--yellow-lt)',c:'#BF360C'},
       {icon:'ti-heart',l:'Маме',v:last.mom||0,bg:'var(--red-lt)',c:'var(--red)'},
       {icon:'ti-building-bank',l:'Подушка безопасности',v:last.pillow||0,bg:'var(--blue-lt)',c:'var(--blue)'},
       {icon:'ti-car',l:'Новая машина',v:last.car||0,bg:'var(--purple-lt)',c:'var(--purple)'},
-      {icon:'ti-wallet',l:'Себе',v:last.mine||0,bg:'var(--green-lt)',c:'var(--green)'},
+      {icon:'ti-wallet',l:'Себе',v:lastMine,bg:'var(--green-lt)',c:'var(--green)'},
     ];
   }
 
@@ -425,7 +427,7 @@ function renderHistory(c){
       const sMom=s.mom||0;
       const sRepair=s.repair||0;
       const sPillow=s.pillow||0;
-      const sMine=s.mine||sNet-(sMom+sRepair+sPillow+(s.car||0));
+      const sMine=sNet-(sMom+sRepair+sPillow+(s.car||0));
       return`<div class="hcard">
         <div class="hcard-top">
           <div class="hcard-date">${fmtD(s.date)}</div>
@@ -579,7 +581,7 @@ function renderStats(c){
   const totalPilF=monthShifts.reduce((a,s)=>a+(s.pillow||0),0);
   const totalCarF=monthShifts.reduce((a,s)=>a+(s.car||0),0);
   const totalMom=monthShifts.reduce((a,s)=>a+(s.mom||0),0);
-  const totalMine=monthShifts.reduce((a,s)=>a+(s.mine||(s.net||(s.gross-s.fuel-s.food))-(s.mom||0)-(s.repair||0)-(s.pillow||0)-(s.car||0)),0);
+  const totalMine=monthShifts.reduce((a,s)=>a+(s.net||(s.gross-s.fuel-s.food))-(s.mom||0)-(s.repair||0)-(s.pillow||0)-(s.car||0),0);
   const repExp=monthExp.filter(e=>e.fund==='repair').reduce((a,e)=>a+e.amount,0);
   const pilExp=monthExp.filter(e=>e.fund==='pillow').reduce((a,e)=>a+e.amount,0);
   const carExp=monthExp.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
@@ -943,7 +945,10 @@ function loadShiftsFromSheets(){
   const cbName='_shifts'+Date.now();
   const s=document.createElement('script');
   window[cbName]=function(data){
-    if(Array.isArray(data)&&data.length>0){saveShifts(data);render();}
+    if(Array.isArray(data)&&data.length>0){
+      data.forEach(s=>{const n=s.net||(s.gross-s.fuel-s.food);s.mine=n-(s.mom||0)-(s.repair||0)-(s.pillow||0)-(s.car||0);});
+      saveShifts(data);render();
+    }
     delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);
   };
   s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
