@@ -189,7 +189,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 <div class="toast" id="toast"></div>
 
 <script>
-const DEF_CFG={debtMom:130000,goalMonth:150000,planShifts:25,pctRepair:20,pctPillow:10,pctCar:0,goalRepair:50000,goalPillow:100000,goalCar:1000000,initRepair:0,initPillow:0,initCar:0,initMom:0};
+const DEF_CFG={debtMom:130000,goalMonth:150000,planShifts:25,pctMom:0,pctRepair:20,pctPillow:10,pctCar:0,goalRepair:50000,goalPillow:100000,goalCar:1000000,initRepair:0,initPillow:0,initCar:0,initMom:0};
 let CFG=Object.assign({},DEF_CFG);
 
 function loadCfg(){try{const c=JSON.parse(localStorage.getItem('cfg')||'{}');CFG=Object.assign({},DEF_CFG,c);}catch(e){CFG=Object.assign({},DEF_CFG);}}
@@ -198,19 +198,22 @@ function loadShifts(){try{return JSON.parse(localStorage.getItem('shifts')||'[]'
 function saveShifts(s){localStorage.setItem('shifts',JSON.stringify(s));}
 function loadFundExpenses(){try{return JSON.parse(localStorage.getItem('fundExpenses')||'[]');}catch(e){return[];}}
 function saveFundExpenses(e){localStorage.setItem('fundExpenses',JSON.stringify(e));}
+function loadFundDeposits(){try{return JSON.parse(localStorage.getItem('fundDeposits')||'[]');}catch(e){return[];}}
+function saveFundDeposits(d){localStorage.setItem('fundDeposits',JSON.stringify(d));}
 
-function calc(g,fu,fo,m){
+function calc(g,fu,fo){
   const n=g-fu-fo;
+  const mo=Math.round(n*(CFG.pctMom||0)/100);
   const rp=Math.round(n*CFG.pctRepair/100);
   const pi=Math.round(n*CFG.pctPillow/100);
   const ca=Math.round(n*CFG.pctCar/100);
-  return{net:n,repair:rp,pillow:pi,car:ca,mine:n-rp-pi-ca-m};
+  return{net:n,mom:mo,repair:rp,pillow:pi,car:ca,mine:n-mo-rp-pi-ca};
 }
 function fmt(n){return Math.round(n).toLocaleString('ru-RU')+' ₽';}
 function fmtD(d){return new Date(d+'T12:00:00').toLocaleDateString('ru-RU',{day:'numeric',month:'short',weekday:'short'});}
-function fundName(f){return f==='repair'?'Ремонтный фонд':f==='pillow'?'Подушка':f==='car'?'На машину':f;}
-function fundColor(f){return f==='repair'?'var(--yellow)':f==='pillow'?'var(--blue)':f==='car'?'var(--purple)':'var(--text)';}
-function fundBg(f){return f==='repair'?'var(--yellow-lt)':f==='pillow'?'var(--blue-lt)':f==='car'?'var(--purple-lt)':'var(--bg3)';}
+function fundName(f){return f==='mom'?'Долг маме':f==='repair'?'Ремонтный фонд':f==='pillow'?'Подушка':f==='car'?'На машину':f;}
+function fundColor(f){return f==='mom'?'var(--red)':f==='repair'?'var(--yellow)':f==='pillow'?'var(--blue)':f==='car'?'var(--purple)':'var(--text)';}
+function fundBg(f){return f==='mom'?'var(--red-lt)':f==='repair'?'var(--yellow-lt)':f==='pillow'?'var(--blue-lt)':f==='car'?'var(--purple-lt)':'var(--bg3)';}
 function pluralM(n){if(n%10===1&&n%100!==11)return'месяц';if([2,3,4].includes(n%10)&&![12,13,14].includes(n%100))return'месяца';return'месяцев';}
 
 let cur='dash';
@@ -221,7 +224,7 @@ loadCfg();
 function go(tab){
   cur=tab;
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const map={dash:'nb-dash',history:'nb-history',add:'nb-add','add-shift':'nb-add','add-expense':'nb-add',stats:'nb-stats',settings:'nb-settings'};
+  const map={dash:'nb-dash',history:'nb-history',add:'nb-add','add-shift':'nb-add','add-expense':'nb-add','add-deposit':'nb-add',stats:'nb-stats',settings:'nb-settings'};
   const nb=document.getElementById(map[tab]);
   if(nb)nb.classList.add('active');
   render();
@@ -237,19 +240,20 @@ function render(){
   else if(cur==='add')renderAdd(c);
   else if(cur==='add-shift')renderAddShift(c);
   else if(cur==='add-expense')renderAddExpense(c);
+  else if(cur==='add-deposit')renderAddDeposit(c);
   else if(cur==='stats')renderStats(c);
   else if(cur==='settings')renderSettings(c);
 }
 
 function getDreamDate(shifts,fundExpenses){
   if(!CFG.goalCar||CFG.goalCar<=0)return null;
-  const totalCarSaved=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).car,0);
+  const totalCarSaved=shifts.reduce((a,s)=>a+(s.car||0),0);
   const totalCarSpent=fundExpenses.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
   const carBalance=(CFG.initCar||0)+totalCarSaved-totalCarSpent;
   const remaining=CFG.goalCar-carBalance;
   if(remaining<=0)return{done:true};
   const monthData={};
-  shifts.forEach(s=>{const ym=s.date.slice(0,7);if(!monthData[ym])monthData[ym]=0;monthData[ym]+=calc(s.gross,s.fuel,s.food,s.mom).car;});
+  shifts.forEach(s=>{const ym=s.date.slice(0,7);if(!monthData[ym])monthData[ym]=0;monthData[ym]+=(s.car||0);});
   const months=Object.values(monthData);
   if(!months.length)return null;
   const recent=months.slice(-3);
@@ -270,35 +274,40 @@ function renderDash(c){
   const ym=now.toISOString().slice(0,7);
   const thisMonth=shifts.filter(s=>s.date&&s.date.slice(0,7)===ym);
   const worked=thisMonth.length;
-  const monthNet=thisMonth.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).net,0);
+  const monthNet=thisMonth.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).net,0);
   const goalPct=CFG.goalMonth>0?Math.round(monthNet/CFG.goalMonth*100):0;
 
-  const totalPaid=(CFG.initMom||0)+shifts.reduce((a,s)=>a+(s.mom||0),0);
-  const totalRepairAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).repair,0);
-  const totalPillowAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).pillow,0);
-  const totalCarAcc=shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).car,0);
+  const fundDeposits=loadFundDeposits();
+  const totalMomAcc=(CFG.initMom||0)+shifts.reduce((a,s)=>a+(s.mom||0),0)+fundDeposits.filter(d=>d.fund==='mom').reduce((a,d)=>a+d.amount,0);
+  const momSpent=fundExpenses.filter(e=>e.fund==='mom').reduce((a,e)=>a+e.amount,0);
+  const totalPaid=totalMomAcc-momSpent;
+  const totalRepairAcc=shifts.reduce((a,s)=>a+(s.repair||0),0);
+  const totalPillowAcc=shifts.reduce((a,s)=>a+(s.pillow||0),0);
+  const totalCarAcc=shifts.reduce((a,s)=>a+(s.car||0),0);
   const repairSpent=fundExpenses.filter(e=>e.fund==='repair').reduce((a,e)=>a+e.amount,0);
   const pillowSpent=fundExpenses.filter(e=>e.fund==='pillow').reduce((a,e)=>a+e.amount,0);
   const carSpent=fundExpenses.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
-  const totalRepair=(CFG.initRepair||0)+totalRepairAcc-repairSpent;
-  const totalPillow=(CFG.initPillow||0)+totalPillowAcc-pillowSpent;
-  const totalCar=(CFG.initCar||0)+totalCarAcc-carSpent;
-  const avgNet=shifts.length>0?shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).net,0)/shifts.length:0;
+  const repairDep=fundDeposits.filter(d=>d.fund==='repair').reduce((a,d)=>a+d.amount,0);
+  const pillowDep=fundDeposits.filter(d=>d.fund==='pillow').reduce((a,d)=>a+d.amount,0);
+  const carDep=fundDeposits.filter(d=>d.fund==='car').reduce((a,d)=>a+d.amount,0);
+  const totalRepair=(CFG.initRepair||0)+totalRepairAcc+repairDep-repairSpent;
+  const totalPillow=(CFG.initPillow||0)+totalPillowAcc+pillowDep-pillowSpent;
+  const totalCar=(CFG.initCar||0)+totalCarAcc+carDep-carSpent;
+  const avgNet=shifts.length>0?shifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food).net,0)/shifts.length:0;
 
   const dream=getDreamDate(shifts,fundExpenses);
 
   let mineVal='—',mineSub='Добавь первую смену';
   let transfers=[];
   if(last){
-    const lc=calc(last.gross,last.fuel,last.food,last.mom);
-    mineVal=fmt(lc.mine);
+    mineVal=fmt(last.mine||0);
     mineSub='Смена '+fmtD(last.date);
     transfers=[
-      {icon:'ti-tool',l:'Ремонт. фонд',v:lc.repair,bg:'var(--yellow-lt)',c:'#BF360C'},
-      {icon:'ti-heart',l:'Маме',v:last.mom,bg:'var(--red-lt)',c:'var(--red)'},
-      {icon:'ti-building-bank',l:'Подушка безопасности',v:lc.pillow,bg:'var(--blue-lt)',c:'var(--blue)'},
-      {icon:'ti-car',l:'Новая машина',v:lc.car,bg:'var(--purple-lt)',c:'var(--purple)'},
-      {icon:'ti-wallet',l:'Себе',v:lc.mine,bg:'var(--green-lt)',c:'var(--green)'},
+      {icon:'ti-tool',l:'Ремонт. фонд',v:last.repair||0,bg:'var(--yellow-lt)',c:'#BF360C'},
+      {icon:'ti-heart',l:'Маме',v:last.mom||0,bg:'var(--red-lt)',c:'var(--red)'},
+      {icon:'ti-building-bank',l:'Подушка безопасности',v:last.pillow||0,bg:'var(--blue-lt)',c:'var(--blue)'},
+      {icon:'ti-car',l:'Новая машина',v:last.car||0,bg:'var(--purple-lt)',c:'var(--purple)'},
+      {icon:'ti-wallet',l:'Себе',v:last.mine||0,bg:'var(--green-lt)',c:'var(--green)'},
     ];
   }
 
@@ -396,9 +405,11 @@ function renderDash(c){
 function renderHistory(c){
   const shifts=loadShifts();
   const expenses=loadFundExpenses();
+  const deposits=loadFundDeposits();
   const items=[
     ...shifts.map((s,i)=>({type:'shift',data:s,origIdx:i,date:s.date})),
-    ...expenses.map((e,i)=>({type:'expense',data:e,origIdx:i,date:e.date}))
+    ...expenses.map((e,i)=>({type:'expense',data:e,origIdx:i,date:e.date})),
+    ...deposits.map((d,i)=>({type:'deposit',data:d,origIdx:i,date:d.date}))
   ].sort((a,b)=>b.date.localeCompare(a.date));
 
   if(!items.length){
@@ -410,25 +421,29 @@ function renderHistory(c){
   el.innerHTML=items.map(item=>{
     if(item.type==='shift'){
       const s=item.data;
-      const x=calc(s.gross,s.fuel,s.food,s.mom);
+      const sNet=s.net||(s.gross-s.fuel-s.food);
+      const sMom=s.mom||0;
+      const sRepair=s.repair||0;
+      const sPillow=s.pillow||0;
+      const sMine=s.mine||sNet-(sMom+sRepair+sPillow+(s.car||0));
       return`<div class="hcard">
         <div class="hcard-top">
           <div class="hcard-date">${fmtD(s.date)}</div>
           <div style="display:flex;align-items:center;gap:8px">
-            <div class="hcard-mine">${fmt(x.mine)}</div>
+            <div class="hcard-mine">${fmt(sMine)}</div>
             <button class="del-btn" onclick="deleteShift(${item.origIdx})" title="Удалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg></button>
           </div>
         </div>
         <div class="hgrid">
           <span>Грязными: <b>${fmt(s.gross)}</b></span>
-          <span>Чистыми: <b>${fmt(x.net)}</b></span>
+          <span>Чистыми: <b>${fmt(s.net||(s.gross-s.fuel-s.food))}</b></span>
           <span>Бензин: <b>${fmt(s.fuel)}</b></span>
-          <span>Маме: <b>${fmt(s.mom)}</b></span>
-          <span>Ремфонд: <b>${fmt(x.repair)}</b></span>
-          <span>Подушка: <b>${fmt(x.pillow)}</b></span>
+          ${sMom>0?`<span>Маме: <b style="color:var(--red)">${fmt(sMom)}</b></span>`:''}
+          ${sRepair>0?`<span>Ремфонд: <b style="color:#BF360C">${fmt(sRepair)}</b></span>`:''}
+          ${sPillow>0?`<span>Подушка: <b style="color:var(--blue)">${fmt(sPillow)}</b></span>`:''}
         </div>
       </div>`;
-    } else {
+    } else if(item.type==='expense'){
       const e=item.data;
       return`<div class="hcard expense">
         <div class="hcard-top">
@@ -444,6 +459,24 @@ function renderHistory(c){
         <div class="hgrid">
           <span>Фонд: <b style="color:${fundColor(e.fund)}">${fundName(e.fund)}</b></span>
           ${e.note?`<span>Комментарий: <b>${e.note}</b></span>`:''}
+        </div>
+      </div>`;
+    } else {
+      const d=item.data;
+      return`<div class="hcard" style="border-left:3px solid var(--green)">
+        <div class="hcard-top">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="hcard-date">${fmtD(d.date)}</div>
+            <span class="hcard-badge" style="background:var(--green-lt);color:var(--green)">взнос в фонд</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="hcard-mine" style="color:var(--green)">+${fmt(d.amount)}</div>
+            <button class="del-btn" onclick="deleteFundDeposit(${item.origIdx})" title="Удалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></svg></button>
+          </div>
+        </div>
+        <div class="hgrid">
+          <span>Фонд: <b style="color:${fundColor(d.fund)}">${fundName(d.fund)}</b></span>
+          ${d.note?`<span>Комментарий: <b>${d.note}</b></span>`:''}
         </div>
       </div>`;
     }
@@ -465,6 +498,10 @@ function renderAdd(c){
         <div class="choice-ico" style="background:var(--orange-lt)"><span class="ico" style="color:var(--orange)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10h3v-3l-3.5 -3.5a6 6 0 0 1 8 8l6 6a2 2 0 0 1 -3 3l-6 -6a6 6 0 0 1 -8 -8l3.5 3.5"/></svg></span></div>
         <div><div class="choice-t">Расход из фонда</div><div class="choice-s">Потратил накопленное (ремонт и т.д.)</div></div>
       </button>
+      <button class="choice-btn" onclick="go('add-deposit')">
+        <div class="choice-ico" style="background:var(--green-lt)"><span class="ico" style="color:var(--green)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/><circle cx="12" cy="12" r="9"/></svg></span></div>
+        <div><div class="choice-t">Взнос в фонд</div><div class="choice-s">Закинуть сверх обычного %</div></div>
+      </button>
     </div>
   `;
   c.appendChild(el);
@@ -484,16 +521,20 @@ function renderAddShift(c){
       <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2"/></svg></span>Грязными</div><input class="finp" type="number" id="fg" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
       <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 11h1a2 2 0 0 1 2 2v3a1.5 1.5 0 0 0 3 0v-7l-3 -3"/><path d="M4 20v-14a2 2 0 0 1 2 -2h6a2 2 0 0 1 2 2v14"/><path d="M3 20h11"/><path d="M18 7v1a1 1 0 0 0 1 1h1"/><path d="M4 11h10"/></svg></span>Бензин</div><input class="finp" type="number" id="ff" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
       <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14c.83 .642 2.077 1.017 3.5 1c1.423 .017 2.67 -.358 3.5 -1c.83 -.642 2.077 -1.017 3.5 -1c1.423 -.017 2.67 .358 3.5 1"/><path d="M8 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M12 3a2.4 2.4 0 0 0 -1 2a2.4 2.4 0 0 0 1 2"/><path d="M3 10h14v5a6 6 0 0 1 -6 6h-2a6 6 0 0 1 -6 -6v-5z"/></svg></span>Еда</div><input class="finp" type="number" id="fe" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
-      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.566"/></svg></span>Маме</div><input class="finp" type="number" id="fm" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
     </div>
     <div class="prev" id="prev" style="display:none">
-      <div class="prev-t">Итог смены</div>
-      <div id="prev-rows"></div>
+      <div class="prev-t">Итог смены <small style="font-size:11px;font-weight:400;color:var(--text3)">· суммы можно изменить</small></div>
+      <div class="prev-row"><span>Чистыми</span><span id="pi-net" style="font-weight:600">—</span></div>
+      <div class="prev-row"><span style="color:var(--text2)">→ Маме <small id="pi-mom-hint" style="color:var(--text3);font-size:11px"></small></span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-mom" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>
+      <div class="prev-row"><span style="color:var(--text2)">→ Ремфонд <small id="pi-rep-hint" style="color:var(--text3);font-size:11px"></small></span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-rep" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>
+      <div class="prev-row"><span style="color:var(--text2)">→ Подушка <small id="pi-pil-hint" style="color:var(--text3);font-size:11px"></small></span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-pil" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>
+      <div class="prev-row"><span style="color:var(--text2)">→ Машина <small id="pi-car-hint" style="color:var(--text3);font-size:11px"></small></span><div style="display:flex;align-items:center;gap:4px"><input type="number" id="fi-car" inputmode="numeric" value="0" oninput="updMine()" style="width:80px;text-align:right;border:1px solid var(--border);border-radius:6px;padding:3px 6px;font-size:14px;font-family:inherit;background:var(--bg)"><span style="font-size:12px;color:var(--text3)">₽</span></div></div>
+      <div class="prev-row" style="margin-top:4px;border-top:1px solid var(--border);padding-top:6px"><span><b>Мои деньги</b></span><span id="pi-mine" style="font-weight:700;color:var(--green)">—</span></div>
     </div>
     <button class="save-btn" onclick="saveShift()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>Сохранить смену</button>
   `;
   c.appendChild(el);
-  ['fg','ff','fe','fm'].forEach(id=>document.getElementById(id).addEventListener('input',updPrev));
+  ['fg','ff','fe'].forEach(id=>document.getElementById(id).addEventListener('input',updPrev));
 }
 
 function renderAddExpense(c){
@@ -509,6 +550,7 @@ function renderAddExpense(c){
       <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg></span>Дата</div><input class="finp" type="date" id="ex-date" value="${today}" style="width:150px;font-size:14px"></div>
       <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></svg></span>Фонд</div>
         <select class="fsel" id="ex-fund">
+          <option value="mom">Долг маме</option>
           <option value="repair">Ремонтный фонд</option>
           <option value="pillow">Подушка</option>
           <option value="car">На машину</option>
@@ -532,12 +574,12 @@ function renderStats(c){
   const totalGross=monthShifts.reduce((a,s)=>a+s.gross,0);
   const totalFuel=monthShifts.reduce((a,s)=>a+s.fuel,0);
   const totalFood=monthShifts.reduce((a,s)=>a+s.food,0);
-  const totalNet=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).net,0);
-  const totalRepF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).repair,0);
-  const totalPilF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).pillow,0);
-  const totalCarF=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).car,0);
+  const totalNet=monthShifts.reduce((a,s)=>a+(s.net||(s.gross-s.fuel-s.food)),0);
+  const totalRepF=monthShifts.reduce((a,s)=>a+(s.repair||0),0);
+  const totalPilF=monthShifts.reduce((a,s)=>a+(s.pillow||0),0);
+  const totalCarF=monthShifts.reduce((a,s)=>a+(s.car||0),0);
   const totalMom=monthShifts.reduce((a,s)=>a+(s.mom||0),0);
-  const totalMine=monthShifts.reduce((a,s)=>a+calc(s.gross,s.fuel,s.food,s.mom).mine,0);
+  const totalMine=monthShifts.reduce((a,s)=>a+(s.mine||(s.net||(s.gross-s.fuel-s.food))-(s.mom||0)-(s.repair||0)-(s.pillow||0)-(s.car||0)),0);
   const repExp=monthExp.filter(e=>e.fund==='repair').reduce((a,e)=>a+e.amount,0);
   const pilExp=monthExp.filter(e=>e.fund==='pillow').reduce((a,e)=>a+e.amount,0);
   const carExp=monthExp.filter(e=>e.fund==='car').reduce((a,e)=>a+e.amount,0);
@@ -551,11 +593,11 @@ function renderStats(c){
   // Records
   let bestShift=null;
   shifts.forEach(s=>{
-    const mine=calc(s.gross,s.fuel,s.food,s.mom).mine;
-    if(!bestShift||mine>calc(bestShift.gross,bestShift.fuel,bestShift.food,bestShift.mom).mine)bestShift=s;
+    const mine=calc(s.gross,s.fuel,s.food).mine;
+    if(!bestShift||mine>calc(bestShift.gross,bestShift.fuel,bestShift.food).mine)bestShift=s;
   });
   const monthNetMap={};
-  shifts.forEach(s=>{const m=s.date.slice(0,7);if(!monthNetMap[m])monthNetMap[m]=0;monthNetMap[m]+=calc(s.gross,s.fuel,s.food,s.mom).net;});
+  shifts.forEach(s=>{const m=s.date.slice(0,7);if(!monthNetMap[m])monthNetMap[m]=0;monthNetMap[m]+=calc(s.gross,s.fuel,s.food).net;});
   const bestMonthEntry=Object.entries(monthNetMap).sort((a,b)=>b[1]-a[1])[0];
   const uniqueDates=[...new Set(shifts.map(s=>s.date))].sort();
   let maxStreak=uniqueDates.length>0?1:0,curStr=1;
@@ -564,7 +606,7 @@ function renderStats(c){
     if(diff===1){curStr++;maxStreak=Math.max(maxStreak,curStr);}else curStr=1;
   }
 
-  const bestShiftVal=bestShift?calc(bestShift.gross,bestShift.fuel,bestShift.food,bestShift.mom).mine:0;
+  const bestShiftVal=bestShift?calc(bestShift.gross,bestShift.fuel,bestShift.food).mine:0;
   const bestMonthVal=bestMonthEntry?bestMonthEntry[1]:0;
   const bestMonthLbl=bestMonthEntry?mNames[parseInt(bestMonthEntry[0].slice(5))-1]+' '+bestMonthEntry[0].slice(0,4):'—';
 
@@ -622,28 +664,61 @@ function statNext(){
 function updPrev(){
   const g=+document.getElementById('fg').value||0;
   if(!g){document.getElementById('prev').style.display='none';return;}
-  const x=calc(g,+document.getElementById('ff').value||0,+document.getElementById('fe').value||0,+document.getElementById('fm').value||0);
-  const rows=[['Чистыми',x.net],['Ремонт. фонд',x.repair],['Подушка',x.pillow],['Маме',+document.getElementById('fm').value||0],['Мои деньги',x.mine]];
-  document.getElementById('prev-rows').innerHTML=rows.map(r=>`<div class="prev-row"><span>${r[0]}</span><span>${fmt(r[1])}</span></div>`).join('');
+  const x=calc(g,+document.getElementById('ff').value||0,+document.getElementById('fe').value||0);
+  const netEl=document.getElementById('pi-net');if(netEl)netEl.textContent=fmt(x.net);
+  const fi=document.getElementById('fi-mom');if(fi)fi.value=x.mom;
+  const fr=document.getElementById('fi-rep');if(fr)fr.value=x.repair;
+  const fp=document.getElementById('fi-pil');if(fp)fp.value=x.pillow;
+  const fc=document.getElementById('fi-car');if(fc)fc.value=x.car;
+  const hm=document.getElementById('pi-mom-hint');if(hm)hm.textContent=x.mom>0?'обяз. '+fmt(x.mom):'';
+  const hr=document.getElementById('pi-rep-hint');if(hr)hr.textContent=x.repair>0?'обяз. '+fmt(x.repair):'';
+  const hp=document.getElementById('pi-pil-hint');if(hp)hp.textContent=x.pillow>0?'обяз. '+fmt(x.pillow):'';
+  const hc=document.getElementById('pi-car-hint');if(hc)hc.textContent=x.car>0?'обяз. '+fmt(x.car):'';
+  updMine();
   document.getElementById('prev').style.display='block';
 }
+function updMine(){
+  const g=+document.getElementById('fg').value||0;
+  const net=g-(+document.getElementById('ff').value||0)-(+document.getElementById('fe').value||0);
+  const mom=+((document.getElementById('fi-mom')||{}).value)||0;
+  const rep=+((document.getElementById('fi-rep')||{}).value)||0;
+  const pil=+((document.getElementById('fi-pil')||{}).value)||0;
+  const car=+((document.getElementById('fi-car')||{}).value)||0;
+  const mine=net-mom-rep-pil-car;
+  const el=document.getElementById('pi-mine');
+  if(el){el.textContent=fmt(mine)+' ₽';el.style.color=mine<0?'var(--red)':'var(--green)';}
+}
 
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxV-IqXpflf_WSSPJ7oirZxFpBL5d1QgC1BS_4fyQ8MMb85eNV0VHpLcrUJtaza_4qm/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbwV3fdiQ51dDM3-Frhl8RpgThf9PqjVSriPTxDKuQYOF_jFxp_TzKMvismof22qAvHF/exec';
+
+function jsonpSend(params,onOk){
+  const cb='_w'+Date.now();
+  const s=document.createElement('script');
+  window[cb]=function(d){delete window[cb];if(s.parentNode)s.parentNode.removeChild(s);if(d&&d.ok&&onOk)onOk();};
+  s.onerror=function(){delete window[cb];if(s.parentNode)s.parentNode.removeChild(s);};
+  s.src=SCRIPT_URL+'?'+params+'&callback='+cb;
+  document.body.appendChild(s);
+}
 
 function saveShift(){
   const date=document.getElementById('fd').value;
   const gross=+document.getElementById('fg').value||0;
   if(!date||!gross){showToast('Укажи дату и выручку');return;}
-  const shift={date,gross,fuel:+document.getElementById('ff').value||0,food:+document.getElementById('fe').value||0,mom:+document.getElementById('fm').value||0};
+  const fuel=+document.getElementById('ff').value||0;
+  const food=+document.getElementById('fe').value||0;
+  const net=gross-fuel-food;
+  const mom=+((document.getElementById('fi-mom')||{}).value)||0;
+  const repair=+((document.getElementById('fi-rep')||{}).value)||0;
+  const pillow=+((document.getElementById('fi-pil')||{}).value)||0;
+  const car=+((document.getElementById('fi-car')||{}).value)||0;
+  const mine=net-mom-repair-pillow-car;
+  const shift={date,gross,fuel,food,mom,repair,pillow,car,net,mine};
   const shifts=loadShifts();
   shifts.push(shift);
   saveShifts(shifts);
+  go('dash');
   showToast('Сохраняю...');
-  const params=new URLSearchParams({date:shift.date,gross:shift.gross,fuel:shift.fuel,food:shift.food,mom:shift.mom});
-  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
-    .then(()=>showToast('Смена сохранена ✓'))
-    .catch(()=>showToast('Сохранено локально'));
-  setTimeout(()=>go('dash'),600);
+  jsonpSend(new URLSearchParams({date,gross,fuel,food,mom,repair,pillow,car,net,mine}).toString(),()=>showToast('Смена сохранена ✓'));
 }
 
 function saveFundExpense(){
@@ -656,12 +731,9 @@ function saveFundExpense(){
   const expenses=loadFundExpenses();
   expenses.push(exp);
   saveFundExpenses(expenses);
+  go('dash');
   showToast('Сохраняю...');
-  const params=new URLSearchParams({action:'save_fund_expense',date,fund,amount,note});
-  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'})
-    .then(()=>showToast('Расход сохранён ✓'))
-    .catch(()=>showToast('Сохранено локально'));
-  setTimeout(()=>go('dash'),600);
+  jsonpSend(new URLSearchParams({action:'save_fund_expense',date,fund,amount,note}).toString(),()=>showToast('Расход сохранён ✓'));
 }
 
 function deleteShift(idx){
@@ -670,9 +742,89 @@ function deleteShift(idx){
   const shift=shifts[idx];
   shifts.splice(idx,1);
   saveShifts(shifts);
-  const params=new URLSearchParams({action:'delete',date:shift.date,gross:shift.gross});
-  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'}).catch(()=>{});
+  jsonpSend(new URLSearchParams({action:'delete',date:shift.date,gross:shift.gross}).toString(),null);
   showToast('Смена удалена');
+  render();
+}
+
+function renderAddDeposit(c){
+  const today=new Date().toISOString().slice(0,10);
+  const el=document.createElement('div');
+  el.style.cssText='width:100%;padding-bottom:20px';
+  el.innerHTML=`
+    <div class="fhd">
+      <button class="back-btn" onclick="go('add')"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0"/><path d="M5 12l6 6"/><path d="M5 12l6 -6"/></svg></span></button>
+      <h2>Взнос в фонд</h2>
+    </div>
+    <div class="fgrp">
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/></svg></span>Дата</div><input class="finp" type="date" id="dep-date" value="${today}" style="width:150px;font-size:14px"></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></svg></span>В фонд</div>
+        <select class="fsel" id="dep-fund">
+          <option value="mom">Долг маме</option>
+          <option value="repair">Ремонтный фонд</option>
+          <option value="pillow">Подушка</option>
+          <option value="car">На машину</option>
+        </select>
+      </div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l14 0"/><path d="M5 12l4 -4"/><path d="M5 12l4 4"/></svg></span>Из фонда<small style="font-size:10px;color:var(--text3);margin-left:4px">или свои</small></div>
+        <select class="fsel" id="dep-from">
+          <option value="">— свои деньги</option>
+          <option value="mom">Долг маме</option>
+          <option value="repair">Ремонтный фонд</option>
+          <option value="pillow">Подушка</option>
+          <option value="car">На машину</option>
+        </select>
+      </div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9m0 2a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2z"/><path d="M14 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9v-2a2 2 0 0 0 -2 -2h-10a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h2"/></svg></span>Сумма</div><input class="finp" type="number" id="dep-amount" placeholder="0" inputmode="numeric"><span class="fsuf">₽</span></div>
+      <div class="frow"><div class="frow-l"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8"/><path d="M8 13h6"/><path d="M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-5l-5 3v-3h-2a3 3 0 0 1 -3 -3v-8a3 3 0 0 1 3 -3h12z"/></svg></span>Комментарий</div><input class="finp" type="text" id="dep-note" placeholder="необязательно"></div>
+    </div>
+    <button class="save-btn" style="background:var(--green)" onclick="saveFundDeposit()"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5l10 -10"/></svg></span>Сохранить</button>
+  `;
+  c.appendChild(el);
+}
+
+function saveFundDeposit(){
+  const date=document.getElementById('dep-date').value;
+  const fund=document.getElementById('dep-fund').value;
+  const fromFund=document.getElementById('dep-from').value;
+  const amount=+document.getElementById('dep-amount').value||0;
+  const note=document.getElementById('dep-note').value.trim();
+  if(!date||!amount){showToast('Укажи дату и сумму');return;}
+  if(fromFund&&fromFund===fund){showToast('Выбери разные фонды');return;}
+  const FUND_NAMES={mom:'Долг маме',repair:'Ремфонд',pillow:'Подушка',car:'На машину'};
+  if(fromFund){
+    const destName=FUND_NAMES[fund]||fund;
+    const srcName=FUND_NAMES[fromFund]||fromFund;
+    const expNote=note?note+' (Перевод → '+destName+')'  :'Перевод → '+destName;
+    const depNote=note?note+' (Перевод из '+srcName+')':'Перевод из '+srcName;
+    const expenses=loadFundExpenses();
+    expenses.push({date,fund:fromFund,amount,note:expNote});
+    saveFundExpenses(expenses);
+    jsonpSend(new URLSearchParams({action:'save_fund_expense',date,fund:fromFund,amount,note:expNote}).toString(),null);
+    const deposits=loadFundDeposits();
+    deposits.push({date,fund,amount,note:depNote});
+    saveFundDeposits(deposits);
+    go('dash');
+    showToast('Сохраняю...');
+    jsonpSend(new URLSearchParams({action:'save_fund_deposit',date,fund,amount,note:depNote}).toString(),()=>showToast('Перевод '+srcName+' → '+destName+' ✓'));
+  } else {
+    const deposits=loadFundDeposits();
+    deposits.push({date,fund,amount,note});
+    saveFundDeposits(deposits);
+    go('dash');
+    showToast('Сохраняю...');
+    jsonpSend(new URLSearchParams({action:'save_fund_deposit',date,fund,amount,note}).toString(),()=>showToast('Взнос сохранён ✓'));
+  }
+}
+
+function deleteFundDeposit(idx){
+  if(!confirm('Удалить этот взнос?'))return;
+  const deposits=loadFundDeposits();
+  const dep=deposits[idx];
+  deposits.splice(idx,1);
+  saveFundDeposits(deposits);
+  jsonpSend(new URLSearchParams({action:'delete_fund_deposit',date:dep.date,fund:dep.fund,amount:dep.amount}).toString(),null);
+  showToast('Взнос удалён');
   render();
 }
 
@@ -682,8 +834,7 @@ function deleteFundExpense(idx){
   const exp=expenses[idx];
   expenses.splice(idx,1);
   saveFundExpenses(expenses);
-  const params=new URLSearchParams({action:'delete_fund_expense',date:exp.date,fund:exp.fund,amount:exp.amount});
-  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'}).catch(()=>{});
+  jsonpSend(new URLSearchParams({action:'delete_fund_expense',date:exp.date,fund:exp.fund,amount:exp.amount}).toString(),null);
   showToast('Расход удалён');
   render();
 }
@@ -701,6 +852,7 @@ function renderSettings(c){
     </div>
     <div class="sec" style="margin-bottom:8px">Проценты отчислений</div>
     <div class="sgrp">
+      <div class="srow"><div class="srow-l">Долг маме<small>% от чистого дохода</small></div><input class="sinp" type="number" id="s-pmom" value="${CFG.pctMom||0}" inputmode="numeric"><span class="ssuf">%</span></div>
       <div class="srow"><div class="srow-l">Ремонтный фонд<small>% от чистого дохода</small></div><input class="sinp" type="number" id="s-prep" value="${CFG.pctRepair}" inputmode="numeric"><span class="ssuf">%</span></div>
       <div class="srow"><div class="srow-l">Подушка безопасности<small>% от чистого дохода</small></div><input class="sinp" type="number" id="s-ppil" value="${CFG.pctPillow}" inputmode="numeric"><span class="ssuf">%</span></div>
       <div class="srow"><div class="srow-l">На новую машину<small>% от чистого дохода</small></div><input class="sinp" type="number" id="s-pcar" value="${CFG.pctCar}" inputmode="numeric"><span class="ssuf">%</span></div>
@@ -728,19 +880,21 @@ function renderSettings(c){
 }
 
 function saveCfgForm(){
-  CFG.debtMom=+document.getElementById('s-debt').value||130000;
-  CFG.goalMonth=+document.getElementById('s-gmon').value||150000;
-  CFG.planShifts=+document.getElementById('s-psh').value||25;
-  CFG.pctRepair=+document.getElementById('s-prep').value||20;
-  CFG.pctPillow=+document.getElementById('s-ppil').value||10;
-  CFG.pctCar=+document.getElementById('s-pcar').value||0;
-  CFG.goalRepair=+document.getElementById('s-grep').value||50000;
-  CFG.goalPillow=+document.getElementById('s-gpil').value||100000;
-  CFG.goalCar=+document.getElementById('s-gcar').value||1000000;
-  CFG.initRepair=+document.getElementById('s-irep').value||0;
-  CFG.initPillow=+document.getElementById('s-ipil').value||0;
-  CFG.initCar=+document.getElementById('s-icar').value||0;
-  CFG.initMom=+document.getElementById('s-imom').value||0;
+  const n=id=>{const v=+document.getElementById(id).value;return isNaN(v)?0:v;};
+  CFG.debtMom=n('s-debt');
+  CFG.goalMonth=n('s-gmon')||150000;
+  CFG.planShifts=n('s-psh')||25;
+  CFG.pctMom=n('s-pmom');
+  CFG.pctRepair=n('s-prep');
+  CFG.pctPillow=n('s-ppil');
+  CFG.pctCar=n('s-pcar');
+  CFG.goalRepair=n('s-grep');
+  CFG.goalPillow=n('s-gpil');
+  CFG.goalCar=n('s-gcar');
+  CFG.initRepair=n('s-irep');
+  CFG.initPillow=n('s-ipil');
+  CFG.initCar=n('s-icar');
+  CFG.initMom=n('s-imom');
   saveCfg();
   syncCfgToSheets();
   showToast('Настройки сохранены');
@@ -767,7 +921,12 @@ function loadCfgFromSheets(){
   const cbName='_cfg'+Date.now();
   const s=document.createElement('script');
   window[cbName]=function(data){
-    if(data&&typeof data==='object'&&Object.keys(data).length>0){CFG=Object.assign({},DEF_CFG,data);saveCfg();render();}
+    if(data&&typeof data==='object'){
+      const knownKeys=Object.keys(DEF_CFG);
+      const valid={};
+      knownKeys.forEach(k=>{if(k in data&&typeof data[k]==='number')valid[k]=data[k];});
+      if(Object.keys(valid).length>0){CFG=Object.assign({},CFG,valid);saveCfg();render();}
+    }
     delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);
   };
   s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
@@ -776,8 +935,8 @@ function loadCfgFromSheets(){
 }
 
 function syncCfgToSheets(){
-  const params=new URLSearchParams({action:'save_settings',debtMom:CFG.debtMom,goalMonth:CFG.goalMonth,planShifts:CFG.planShifts,pctRepair:CFG.pctRepair,pctPillow:CFG.pctPillow,pctCar:CFG.pctCar,goalRepair:CFG.goalRepair,goalPillow:CFG.goalPillow,goalCar:CFG.goalCar,initRepair:CFG.initRepair||0,initPillow:CFG.initPillow||0,initCar:CFG.initCar||0,initMom:CFG.initMom||0});
-  fetch(SCRIPT_URL+'?'+params.toString(),{mode:'no-cors'}).catch(()=>{});
+  const params=new URLSearchParams({action:'save_settings',debtMom:CFG.debtMom,goalMonth:CFG.goalMonth,planShifts:CFG.planShifts,pctRepair:CFG.pctRepair,pctPillow:CFG.pctPillow,pctCar:CFG.pctCar,goalRepair:CFG.goalRepair,goalPillow:CFG.goalPillow,goalCar:CFG.goalCar,initRepair:CFG.initRepair||0,initPillow:CFG.initPillow||0,initCar:CFG.initCar||0,initMom:CFG.initMom||0,pctMom:CFG.pctMom||0}).toString();
+  jsonpSend(params,null);
 }
 
 function loadShiftsFromSheets(){
@@ -804,10 +963,23 @@ function loadFundExpensesFromSheets(){
   document.body.appendChild(s);
 }
 
+function loadFundDepositsFromSheets(){
+  const cbName='_dep'+Date.now();
+  const s=document.createElement('script');
+  window[cbName]=function(data){
+    if(Array.isArray(data)&&data.length>0){saveFundDeposits(data);render();}
+    delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);
+  };
+  s.onerror=function(){delete window[cbName];if(s.parentNode)s.parentNode.removeChild(s);};
+  s.src=SCRIPT_URL+'?action=get_fund_deposits&callback='+cbName;
+  document.body.appendChild(s);
+}
+
 render();
 loadCfgFromSheets();
 loadShiftsFromSheets();
 loadFundExpensesFromSheets();
+loadFundDepositsFromSheets();
 </script>
 </body>
 </html>
